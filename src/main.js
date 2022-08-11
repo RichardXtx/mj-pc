@@ -7,7 +7,7 @@ import store from './store'
 import '@/utils/element'
 
 // 引入 axios
-import axios from 'axios'
+import axios from '@/utils/axios'
 
 // 挂载到vue实例上
 Vue.prototype.$axios = axios

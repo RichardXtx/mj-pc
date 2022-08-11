@@ -4,7 +4,7 @@
       <template #header>黑马面经运营后台</template>
 
       <!-- atuo 自动 complete 完成 -->
-      <el-form autocomplete="off" :model="form" :rules="rules">
+      <el-form autocomplete="off" :model="form" :rules="rules" ref="formRef">
         <!-- 用户名 -->
         <el-form-item label="用户名" prop="username">
           <el-input
@@ -24,7 +24,7 @@
 
         <!-- 登录 -->
         <el-form class="tc">
-          <el-button type="primary">登 录</el-button>
+          <el-button type="primary" @click="login">登 录</el-button>
           <el-button>重 置</el-button>
         </el-form>
       </el-form>
@@ -39,7 +39,7 @@ export default {
 
     var passwordFn = (rule, value, callback) => {
       let res = /^\w{5,11}$/
-      if (res.test(value) == '') {
+      if (res.test(value) == false) {
         callback(new Error('密码不规范'))
       }
       else {
@@ -64,9 +64,34 @@ export default {
       },
     }
 
+
   },
 
+
   methods: {
+    login () {
+      // this.$refs.formRef: 获取组件对象
+      // validate: 组件对象的方法
+      this.$refs.formRef.validate(async val => {
+
+        if (val) {
+          // alert('提交成功')
+          let res = await this.$axios({
+            url: '/auth/login',
+            method: 'POST',
+            data: this.form
+          })
+          console.log(res)
+          localStorage.setItem('pc_token', 'Bearer ' + res.data.data.token)
+          this.$router.push('/dashboard')
+
+        } else {
+          alert('提交失败')
+          return false
+        }
+      })
+    }
+
 
   }
 }
@@ -84,7 +109,7 @@ export default {
     width: 420px;
     ::v-deep .el-card__header {
       height: 80px;
-      background: rgba(114, 124, 245, 1);
+      background: rgb(107, 116, 219);
       text-align: center;
       line-height: 40px;
       color: #fff;
