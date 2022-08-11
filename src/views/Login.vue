@@ -82,7 +82,8 @@ export default {
             data: this.form
           })
           console.log(res)
-          localStorage.setItem('pc_token', 'Bearer ' + res.data.data.token)
+          // localStorage.setItem('pc_token', 'Bearer ' + res.data.data.token)
+          this.$store.commit('user/set', 'Bearer ' + res.data.data.token)
           this.$router.push('/dashboard')
 
         } else {

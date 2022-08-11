@@ -3,15 +3,12 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+// 引入user 模块名
+import user from '@/store/modules/user'
+
 export default new Vuex.Store({
-  state: {
-  },
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
+
   modules: {
+    user
   }
 })
