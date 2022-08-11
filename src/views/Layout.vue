@@ -30,7 +30,10 @@
           <el-link :underline="false">{{ obj.username }}</el-link>
         </div>
         <div class="logout">
-          <el-popconfirm title="您确认退出黑马面运营后台吗？">
+          <el-popconfirm
+            title="您确认退出黑马面运营后台吗？"
+            @confirm="confirm"
+          >
             <i
               slot="reference"
               title="logout"
@@ -60,6 +63,16 @@ export default {
     })
     // console.log(res)
     this.obj = res.data.data
+  },
+
+  methods: {
+    confirm () {
+      // 跳转页面
+      this.$router.push('/login')
+
+      // 清除token
+      this.$store.commit('user/set', '')
+    }
   }
 }
 </script>
