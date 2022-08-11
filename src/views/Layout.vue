@@ -58,7 +58,7 @@ export default {
     let res = await this.$axios({
       url: "auth/currentUser"
     })
-    console.log(res)
+    // console.log(res)
     this.obj = res.data.data
   }
 }
