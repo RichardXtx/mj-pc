@@ -4,9 +4,9 @@
       <template #header>黑马面经运营后台</template>
 
       <!-- atuo 自动 complete 完成 -->
-      <el-form autocomplete="off" :model="form">
+      <el-form autocomplete="off" :model="form" :rules="rules">
         <!-- 用户名 -->
-        <el-form-item label="用户名">
+        <el-form-item label="用户名" prop="username">
           <el-input
             placehoalder="输入用户名"
             v-model="form.username"
@@ -14,7 +14,7 @@
         </el-form-item>
 
         <!-- 密码 -->
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input
             type="password"
             placeholder="输入用户密码"
@@ -40,10 +40,21 @@ export default {
       form: {
         username: '',
         password: ''
-      }
-
+      },
+      rules: { // 验证规则
+        username: [
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          { min: 5, max: 11, message: '长度在 5 到 11 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 5, max: 11, message: '长度在 5 到 11 个字符', trigger: 'blur' }
+        ]
+      },
     }
+
   },
+
   methods: {
 
   }
