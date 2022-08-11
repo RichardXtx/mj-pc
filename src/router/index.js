@@ -9,6 +9,8 @@ import Layout from '@/views/Layout.vue'
 import Dashboard from '@/views/Layout/Dashboard.vue'
 import Article from '@/views/Layout/Article.vue'
 
+// 导入数据中心
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -37,6 +39,27 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+
+router.beforeEach((to, from, next) => {
+
+  // 1. 获取token
+  // 组件内 this.$store.
+  // 组件外 导入数据中心 store.
+
+  let token = store.state.user.token
+
+  if (token) {
+    next()
+  } else {
+    if (to.path == '/login') {
+      next()
+    } else {
+      next('/login')
+    }
+  }
+
+
 })
 
 export default router
