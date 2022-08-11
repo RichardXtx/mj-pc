@@ -36,6 +36,17 @@
 export default {
   name: 'login-page',
   data () {
+
+    var passwordFn = (rule, value, callback) => {
+      let res = /^\w{5,11}$/
+      if (res.test(value) == '') {
+        callback(new Error('密码不规范'))
+      }
+      else {
+        callback()
+      }
+
+    }
     return {
       form: {
         username: '',
@@ -48,7 +59,7 @@ export default {
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 5, max: 11, message: '长度在 5 到 11 个字符', trigger: 'blur' }
+          { validator: passwordFn, trigger: 'blur' }
         ]
       },
     }
