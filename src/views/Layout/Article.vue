@@ -1,5 +1,6 @@
 <template>
   <div class="article-page">
+    <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>面经后台</el-breadcrumb-item>
       <el-breadcrumb-item>面经管理</el-breadcrumb-item>
@@ -10,7 +11,13 @@
       <template #header>
         <div class="header">
           <span>共 {{ total }} 条记录</span>
-          <el-button icon="el-icon-plus" size="small" type="primary" round>
+          <el-button
+            icon="el-icon-plus"
+            size="small"
+            type="primary"
+            round
+            @click="show('新增')"
+          >
             添加面经
           </el-button>
         </div>
@@ -32,6 +39,8 @@
         <el-table-column prop="creator" label="作者"> </el-table-column>
         <el-table-column prop="likeCount" label="点赞"> </el-table-column>
         <el-table-column prop="views" label="浏览数"> </el-table-column>
+        <el-table-column prop="content" label="内容" show-overflow-tooltip>
+        </el-table-column>
         <el-table-column prop="createdAt" label="更新时间" width="177">
         </el-table-column>
         <el-table-column label="操作" width="150">
@@ -41,8 +50,8 @@
 
             <!-- 三个按钮 -->
             <div class="actions">
-              <i class="el-icon-view"></i>
-              <i class="el-icon-edit-outline"></i>
+              <i class="el-icon-view" @click="show('预览')"></i>
+              <i class="el-icon-edit-outline" @click="show('编辑')"></i>
               <i class="el-icon-delete"></i>
             </div>
           </template>
@@ -61,6 +70,16 @@
       >
       </el-pagination>
     </el-card>
+
+    <!-- 新增 抽屉式 弹框 -->
+    <el-drawer
+      :title="title"
+      :visible.sync="drawer"
+      :direction="direction"
+      :before-close="handleClose"
+    >
+      <span>我来啦!</span>
+    </el-drawer>
   </div>
 </template>
 
@@ -69,7 +88,7 @@ export default {
   name: 'article-page',
   data () {
     return {
-      tableData: [{
+      tableData: [{ // 默认展示数据
         date: '2016-05-02',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄'
@@ -89,8 +108,12 @@ export default {
       current: 1, // 当前页数
       pageSize: 10, // 每页展示数量
 
-      // 总文章数
-      total: 0
+      total: 0, // 总文章数
+
+      drawer: false, // 默认关闭
+      direction: 'rtl', // 方向，这个为 右到左
+
+      title: ''  // 标题
     }
   },
   created () {
@@ -124,11 +147,23 @@ export default {
       this.pageSize = val
       this.getList()
     },
-    handleCurrentChange (val) {
+    handleCurrentChange (val) { // 页码变了执行
       // console.log(`当前页: ${val}`)
       this.current = val
       this.getList()
-    }
+    },
+    handleClose (done) { // ele抽屉
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => { })
+    },
+    show (val) { // 抽屉显示隐藏
+      this.drawer = true // 点击打开
+
+      this.title = val // 将参数赋值给标题
+    },
   },
 }
 </script>
