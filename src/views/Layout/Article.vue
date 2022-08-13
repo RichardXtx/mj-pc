@@ -147,7 +147,6 @@ export default {
         ],
       },
 
-
     }
   },
   created () {
@@ -186,12 +185,11 @@ export default {
       this.current = val
       this.getList()
     },
-    handleClose (done) { // ele抽屉
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done()
-        })
-        .catch(_ => { })
+    handleClose (done) { // ele 抽屉关闭
+      this.$refs.form.resetFields() // 重置表单校验结果
+
+      this.drawer = false
+
     },
     show (val) { // 抽屉显示隐藏
       this.drawer = true // 点击打开
@@ -209,7 +207,8 @@ export default {
   },
   components: { // 注册组件
     quillEditor
-  }
+  },
+
 }
 </script>
 
