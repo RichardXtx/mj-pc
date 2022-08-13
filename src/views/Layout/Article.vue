@@ -39,7 +39,10 @@
         <el-table-column prop="creator" label="作者"> </el-table-column>
         <el-table-column prop="likeCount" label="点赞"> </el-table-column>
         <el-table-column prop="views" label="浏览数"> </el-table-column>
-        <el-table-column prop="content" label="内容" show-overflow-tooltip>
+        <el-table-column label="内容" show-overflow-tooltip prop="content">
+          <!--  <template slot-scope="scope">
+            {{ scope.row.content.replace(/<[^>]+>/g, "") }}
+          </template> -->
         </el-table-column>
         <el-table-column prop="createdAt" label="更新时间" width="177">
         </el-table-column>
@@ -93,7 +96,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
-          <el-button @click="drawer = false">取消</el-button>
+          <el-button @click="close">取消</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -161,7 +164,9 @@ export default {
   },
 
   methods: { // 各类方法
-
+    aa (u) {
+      console.log(u)
+    },
     async getList () { // 公共请求数据函数
       let res = await this.$axios({
         url: '/admin/interview/query',
@@ -193,41 +198,67 @@ export default {
       this.current = val
       this.getList()
     },
-    handleClose (done) { // ele 抽屉关闭
+    handleClose () { // ele 抽屉关闭
 
       this.$refs.form.resetFields() // 重置表单校验结果
 
       this.drawer = false
 
+
     },
     async show (val, id) { // 抽屉显示隐藏
+
       this.drawer = true // 点击打开
 
       this.title = val // 将参数赋值给标题
 
-      if (val == '编辑') {
+
+      if (val == '编辑') { // 编辑
         let res = await this.$axios({
           url: "/admin/interview/show",
           params: { id }
         })
         // console.log(res)
+        // 数据回显赋值
         this.form.stem = res.data.data.stem
         this.form.content = res.data.data.content
+
+        // 记录id
+        this.id = res.data.data.id
       }
     },
-    onSubmit () { // form提交
+    onSubmit () { // 新增
       this.$refs.form.validate(async (val) => {
         if (val) {
-          let res = await this.$axios({
-            url: '/admin/interview/create',
-            method: "post",
-            data: this.form
-          })
-          console.log(res)
-          this.$message({
-            message: '恭喜你，新增成功',
-            type: 'success'
-          })
+
+          if (this.title == '新增') {
+            let res = await this.$axios({
+              url: '/admin/interview/create',
+              method: "post",
+              data: this.form
+            })
+            // console.log(res)
+            this.$message({
+              message: '恭喜你，新增成功',
+              type: 'success'
+            })
+
+          } else if (this.title == '编辑') {
+            let res = await this.$axios({
+              url: '/admin/interview/update',
+              method: "put",
+              data: {
+                id: this.id,
+                ...this.form // 展开this.form中的两个值
+              }
+            })
+            // console.log(res)
+            this.$message({
+              message: '编辑成功',
+              type: 'success'
+            })
+
+          }
 
           this.handleClose() // 重置表单
           this.getList() // 重新请求数据
@@ -260,6 +291,9 @@ export default {
 
         })
 
+    },
+    close () { // 取消框
+      this.handleClose()
     }
   },
 
