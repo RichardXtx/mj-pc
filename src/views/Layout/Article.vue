@@ -103,8 +103,10 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
+
 export default {
   name: 'article-page',
+
   data () { // 初始化数据
     return {
       tableData: [{ // 默认展示数据
@@ -149,10 +151,12 @@ export default {
 
     }
   },
+
   created () {
     this.getList()
 
   },
+
   methods: { // 各类方法
     async getList () { // 公共请求数据函数
       let res = await this.$axios({
@@ -186,6 +190,7 @@ export default {
       this.getList()
     },
     handleClose (done) { // ele 抽屉关闭
+
       this.$refs.form.resetFields() // 重置表单校验结果
 
       this.drawer = false
@@ -196,19 +201,37 @@ export default {
 
       this.title = val // 将参数赋值给标题
     },
-    onSubmit () { // form 框点击创建提交函数
-      console.log('submit!')
+    onSubmit () { // form提交
+      this.$refs.form.validate(async (val) => {
+        if (val) {
+          let res = await this.$axios({
+            url: '/admin/interview/create',
+            method: "post",
+            data: this.form
+          })
+          console.log(res)
+          this.$message({
+            message: '恭喜你，新增成功',
+            type: 'success'
+          })
+          this.handleClose()
+          this.getList()
+
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     fwbBlur () { // 富文本编辑器失焦函数
       this.$refs.form.validateField('content')
       console.log('失焦了')
     },
-
   },
+
   components: { // 注册组件
     quillEditor
   },
-
 }
 </script>
 
