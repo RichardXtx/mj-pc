@@ -40,9 +40,9 @@
         <el-table-column prop="likeCount" label="点赞"> </el-table-column>
         <el-table-column prop="views" label="浏览数"> </el-table-column>
         <el-table-column label="内容" show-overflow-tooltip prop="content">
-          <!--  <template slot-scope="scope">
-            {{ scope.row.content.replace(/<[^>]+>/g, "") }}
-          </template> -->
+          <template slot-scope="scope" v-if="scope.row.content">
+            {{ scope.row.content.replace(/&lt;[^>]+>/g, "") }}
+          </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="更新时间" width="177">
         </el-table-column>
@@ -53,7 +53,7 @@
 
             <!-- 三个按钮 -->
             <div class="actions">
-              <i class="el-icon-view" @click="show('预览')"></i>
+              <i class="el-icon-view" @click="show('预览', scope.row.id)"></i>
               <i
                 class="el-icon-edit-outline"
                 @click="show('编辑', scope.row.id)"
@@ -85,8 +85,20 @@
       :direction="direction"
       :before-close="handleClose"
     >
+      <!-- 预览结构 -->
+      <div v-if="title == '预览'" class="article-preview">
+        <h5>{{ form.stem }}</h5>
+        <div v-html="form.content"></div>
+      </div>
+
       <!-- form 表单 -->
-      <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+      <el-form
+        v-else
+        ref="form"
+        :model="form"
+        label-width="80px"
+        :rules="rules"
+      >
         <el-form-item label="标题" prop="stem">
           <el-input v-model="form.stem"></el-input>
         </el-form-item>
@@ -95,7 +107,7 @@
           <quillEditor v-model="form.content" @blur="fwbBlur"></quillEditor>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">立即创建</el-button>
+          <el-button type="primary" @click="onSubmit">{{ title }}</el-button>
           <el-button @click="close">取消</el-button>
         </el-form-item>
       </el-form>
@@ -141,6 +153,8 @@ export default {
       direction: 'rtl', // 方向，这个为 右到左
 
       title: '',  // 标题,
+
+
 
       form: { // form 表单初始数据
         stem: '',
@@ -200,9 +214,17 @@ export default {
     },
     handleClose () { // ele 抽屉关闭
 
-      this.$refs.form.resetFields() // 重置表单校验结果
+      if (this.title != '预览') { // 预览的时候，没form所以报错
+        this.$refs.form.resetFields() // 重置表单校验结果
 
+      }
+
+      // 抽屉隐藏
       this.drawer = false
+
+      // 手动清空
+      this.form.stem = ''
+      this.form.content = ''
 
 
     },
@@ -213,7 +235,7 @@ export default {
       this.title = val // 将参数赋值给标题
 
 
-      if (val == '编辑') { // 编辑
+      if (val == '编辑' || val == '预览') { // 编辑
         let res = await this.$axios({
           url: "/admin/interview/show",
           params: { id }
@@ -244,6 +266,7 @@ export default {
             })
 
           } else if (this.title == '编辑') {
+
             let res = await this.$axios({
               url: '/admin/interview/update',
               method: "put",
