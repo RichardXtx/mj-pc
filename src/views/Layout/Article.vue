@@ -6,28 +6,60 @@
     </el-breadcrumb>
 
     <el-card shadow="never" border="false">
+      <!-- 头部 -->
       <template #header>
         <div class="header">
-          <span>共 300 条记录</span>
+          <span>共 {{ total }} 条记录</span>
           <el-button icon="el-icon-plus" size="small" type="primary" round>
             添加面经
           </el-button>
         </div>
       </template>
 
-      <!-- body -->
+      <!-- table表格 -->
       <el-table
         :data="tableData"
         style="width: 100%"
         :row-class-name="tableRowClassName"
       >
-        <el-table-column prop="stem" label="标题" width="260">
+        <el-table-column
+          prop="stem"
+          label="标题"
+          width="260"
+          show-overflow-tooltip
+        >
         </el-table-column>
         <el-table-column prop="creator" label="作者"> </el-table-column>
         <el-table-column prop="likeCount" label="点赞"> </el-table-column>
         <el-table-column prop="views" label="浏览数"> </el-table-column>
-        <el-table-column prop="createdAt" label="更新时间"> </el-table-column>
+        <el-table-column prop="createdAt" label="更新时间" width="177">
+        </el-table-column>
+        <el-table-column label="操作" width="150">
+          <!-- slot-scope="scope" -->
+          <template slot-scope="scope">
+            <!-- scope.$index, scope.row -->
+
+            <!-- 三个按钮 -->
+            <div class="actions">
+              <i class="el-icon-view"></i>
+              <i class="el-icon-edit-outline"></i>
+              <i class="el-icon-delete"></i>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="current"
+        :page-sizes="[10, 30, 50, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      >
+      </el-pagination>
     </el-card>
   </div>
 </template>
@@ -54,29 +86,48 @@ export default {
         name: '王小虎',
         address: '上海市普陀区金沙江路 1516 弄'
       }],
-      current: 1,
-      pageSize: 10
+      current: 1, // 当前页数
+      pageSize: 10, // 每页展示数量
+
+      // 总文章数
+      total: 0
     }
   },
-  async created () {
-    let res = await this.$axios({
-      url: '/admin/interview/query',
-      params: {
-        current: this.current,
-        pageSize: this.pageSize
-      }
-    })
-    console.log(res)
-    this.tableData = res.data.data.rows
+  created () {
+    this.getList()
+
   },
   methods: {
-    tableRowClassName ({ row, rowIndex }) {
+    async getList () { // 公共请求数据函数
+      let res = await this.$axios({
+        url: '/admin/interview/query',
+        params: {
+          current: this.current,
+          pageSize: this.pageSize
+        }
+      })
+      // console.log(res)
+      this.tableData = res.data.data.rows
+      // console.log(res.data.data)
+      this.total = res.data.data.total
+    },
+    tableRowClassName ({ row, rowIndex }) { // 颜色
       if (rowIndex % 2 == 0) {
         return 'warning-row'
       } else if (rowIndex % 2 != 0) {
         return 'success-row'
       }
       return ''
+    },
+    handleSizeChange (val) { // 每页页数变化执行
+      // console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange (val) {
+      // console.log(`当前页: ${val}`)
+      this.current = val
+      this.getList()
     }
   },
 }
@@ -131,7 +182,7 @@ export default {
   }
 }
 ::v-deep .el-table .warning-row {
-  background: oldlace;
+  background: rgb(18, 196, 241);
 }
 ::v-deep .el-table .success-row {
   background: #f0f9eb;
