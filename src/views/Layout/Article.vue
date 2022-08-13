@@ -80,13 +80,13 @@
       :before-close="handleClose"
     >
       <!-- form 表单 -->
-      <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="活动名称">
+      <el-form ref="form" :model="form" label-width="80px" :rules="rules">
+        <el-form-item label="标题" prop="stem">
           <el-input v-model="form.stem"></el-input>
         </el-form-item>
-        <el-form-item label="活动形式">
+        <el-form-item label="内容" prop="content">
           <!-- <el-input type="textarea" v-model="form.content"></el-input> -->
-          <quillEditor v-model="form.content"></quillEditor>
+          <quillEditor v-model="form.content" @blur="fwbBlur"></quillEditor>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
@@ -137,14 +137,24 @@ export default {
       form: { // form 表单初始数据
         stem: '',
         content: '',
-      }
+      },
+      rules: { // 验证规则
+        stem: [ // 标题验证规则
+          { required: true, message: '请输入用户标题', trigger: 'blur' },
+        ],
+        content: [ // 标题验证规则
+          { required: true, message: '请输入内容', trigger: 'blur' },
+        ],
+      },
+
+
     }
   },
   created () {
     this.getList()
 
   },
-  methods: {
+  methods: { // 各类方法
     async getList () { // 公共请求数据函数
       let res = await this.$axios({
         url: '/admin/interview/query',
@@ -190,7 +200,12 @@ export default {
     },
     onSubmit () { // form 框点击创建提交函数
       console.log('submit!')
-    }
+    },
+    fwbBlur () { // 富文本编辑器失焦函数
+      this.$refs.form.validateField('content')
+      console.log('失焦了')
+    },
+
   },
   components: { // 注册组件
     quillEditor
