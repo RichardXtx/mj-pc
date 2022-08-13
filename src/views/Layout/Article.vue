@@ -51,8 +51,11 @@
             <!-- 三个按钮 -->
             <div class="actions">
               <i class="el-icon-view" @click="show('预览')"></i>
-              <i class="el-icon-edit-outline" @click="show('编辑')"></i>
-              <i class="el-icon-delete"></i>
+              <i
+                class="el-icon-edit-outline"
+                @click="show('编辑', scope.row.id)"
+              ></i>
+              <i class="el-icon-delete" @click="del(scope.row.id)"></i>
             </div>
           </template>
         </el-table-column>
@@ -90,7 +93,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
-          <el-button>取消</el-button>
+          <el-button @click="drawer = false">取消</el-button>
         </el-form-item>
       </el-form>
     </el-drawer>
@@ -158,6 +161,7 @@ export default {
   },
 
   methods: { // 各类方法
+
     async getList () { // 公共请求数据函数
       let res = await this.$axios({
         url: '/admin/interview/query',
@@ -196,10 +200,20 @@ export default {
       this.drawer = false
 
     },
-    show (val) { // 抽屉显示隐藏
+    async show (val, id) { // 抽屉显示隐藏
       this.drawer = true // 点击打开
 
       this.title = val // 将参数赋值给标题
+
+      if (val == '编辑') {
+        let res = await this.$axios({
+          url: "/admin/interview/show",
+          params: { id }
+        })
+        // console.log(res)
+        this.form.stem = res.data.data.stem
+        this.form.content = res.data.data.content
+      }
     },
     onSubmit () { // form提交
       this.$refs.form.validate(async (val) => {
@@ -214,8 +228,9 @@ export default {
             message: '恭喜你，新增成功',
             type: 'success'
           })
-          this.handleClose()
-          this.getList()
+
+          this.handleClose() // 重置表单
+          this.getList() // 重新请求数据
 
         } else {
           console.log('error submit!!')
@@ -225,8 +240,27 @@ export default {
     },
     fwbBlur () { // 富文本编辑器失焦函数
       this.$refs.form.validateField('content')
-      console.log('失焦了')
     },
+    del (id) { // 删除
+      this.$confirm('你确定删除吗?')
+        .then(async _ => {
+          await this.$axios({
+            url: '/admin/interview/remove',
+            method: 'delete',
+            data: { id }
+          })
+          this.$message({ // 成功提示
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getList()  // 重新渲染列表
+
+        })
+        .catch(_ => {
+
+        })
+
+    }
   },
 
   components: { // 注册组件
