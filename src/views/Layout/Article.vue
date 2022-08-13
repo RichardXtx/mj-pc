@@ -73,20 +73,39 @@
 
     <!-- 新增 抽屉式 弹框 -->
     <el-drawer
+      size="70%"
       :title="title"
       :visible.sync="drawer"
       :direction="direction"
       :before-close="handleClose"
     >
-      <span>我来啦!</span>
+      <!-- form 表单 -->
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="活动名称">
+          <el-input v-model="form.stem"></el-input>
+        </el-form-item>
+        <el-form-item label="活动形式">
+          <!-- <el-input type="textarea" v-model="form.content"></el-input> -->
+          <quillEditor v-model="form.content"></quillEditor>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">立即创建</el-button>
+          <el-button>取消</el-button>
+        </el-form-item>
+      </el-form>
     </el-drawer>
   </div>
 </template>
 
 <script>
+// 富文本编辑器局部引入
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import { quillEditor } from 'vue-quill-editor'
 export default {
   name: 'article-page',
-  data () {
+  data () { // 初始化数据
     return {
       tableData: [{ // 默认展示数据
         date: '2016-05-02',
@@ -113,7 +132,12 @@ export default {
       drawer: false, // 默认关闭
       direction: 'rtl', // 方向，这个为 右到左
 
-      title: ''  // 标题
+      title: '',  // 标题,
+
+      form: { // form 表单初始数据
+        stem: '',
+        content: '',
+      }
     }
   },
   created () {
@@ -164,7 +188,13 @@ export default {
 
       this.title = val // 将参数赋值给标题
     },
+    onSubmit () { // form 框点击创建提交函数
+      console.log('submit!')
+    }
   },
+  components: { // 注册组件
+    quillEditor
+  }
 }
 </script>
 
